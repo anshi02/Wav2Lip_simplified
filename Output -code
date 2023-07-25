@@ -1,0 +1,19 @@
+#@title STEP4: Start Crunching and Preview Output
+#@markdown <b>Note: Only change these, if you have to</b>
+pad_top =  0#@param {type:"integer"}
+pad_bottom =  10#@param {type:"integer"}
+pad_left =  0#@param {type:"integer"}
+pad_right =  0#@param {type:"integer"}
+rescaleFactor =  1#@param {type:"integer"}
+nosmooth = False #@param {type:"boolean"}
+
+
+if nosmooth == False:
+  !cd Wav2Lip && python inference.py --checkpoint_path checkpoints/wav2lip_gan.pth --face "../sample_data/input_vid.mp4" --audio "../sample_data/input_audio.wav" --pads $pad_top $pad_bottom $pad_left $pad_right --resize_factor $rescaleFactor
+else:
+  !cd Wav2Lip && python inference.py --checkpoint_path checkpoints/wav2lip_gan.pth --face "../sample_data/input_vid.mp4" --audio "../sample_data/input_audio.wav" --pads $pad_top $pad_bottom $pad_left $pad_right --resize_factor $rescaleFactor --nosmooth
+#Preview output video
+clear_output()
+print("Final Video Preview")
+print("Download this video from", '/content/Wav2Lip/results/result_voice.mp4')
+showVideo('/content/Wav2Lip/results/result_voice.mp4')

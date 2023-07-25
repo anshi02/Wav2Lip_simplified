@@ -1,0 +1,56 @@
+#@title STEP3: Select Audio (Record, Upload from local drive or Gdrive)
+import os
+from IPython.display import Audio
+from IPython.core.display import display
+
+upload_method = 'Upload' #@param ['Record', 'Upload', 'Custom Path']
+
+#remove previous input audio
+if os.path.isfile('/content/sample_data/input_audio.wav'):
+    os.remove('/content/sample_data/input_audio.wav')
+
+def displayAudio():
+  display(Audio('/content/sample_data/input_audio.wav'))
+
+if upload_method == 'Record':
+  audio, sr = get_audio()
+  import scipy
+  scipy.io.wavfile.write('/content/sample_data/input_audio.wav', sr, audio)
+
+elif upload_method == 'Upload':
+  from google.colab import files
+  uploaded = files.upload()
+  for fn in uploaded.keys():
+    print('User uploaded file "{name}" with length {length} bytes'.format(
+        name=fn, length=len(uploaded[fn])))
+
+  # Consider only the first file
+  PATH_TO_YOUR_AUDIO = str(list(uploaded.keys())[0])
+
+  # Load audio with specified sampling rate
+  import librosa
+  audio, sr = librosa.load(PATH_TO_YOUR_AUDIO, sr=None)
+
+  # Save audio with specified sampling rate
+  import soundfile as sf
+  sf.write('/content/sample_data/input_audio.wav', audio, sr, format='wav')
+
+  clear_output()
+  displayAudio()
+
+elif upload_method == 'Custom Path':
+  from google.colab import drive
+  drive.mount('/content/drive')
+  #@markdown ``Add the full path to audio on Gdrive``
+  PATH_TO_YOUR_AUDIO = '/content/drive/MyDrive/output10.wav' #@param {type:"string"}
+
+  # Load audio with specified sampling rate
+  import librosa
+  audio, sr = librosa.load(PATH_TO_YOUR_AUDIO, sr=None)
+
+  # Save audio with specified sampling rate
+  import soundfile as sf
+  sf.write('/content/sample_data/input_audio.wav', audio, sr, format='wav')
+
+  clear_output()
+  displayAudio()

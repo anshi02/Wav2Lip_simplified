@@ -1,0 +1,42 @@
+#@title STEP2: Upload a Youtube Video URL
+# Install yt-dlp
+
+import os
+!pip install yt-dlp
+
+
+
+
+!rm -df youtube.mp4
+
+#@markdown ___
+from urllib import parse as urlparse
+YOUTUBE_URL = 'https://www.youtube.com/watch?v=vAnWYLTdvfY' #@param {type:"string"}
+url_data = urlparse.urlparse(YOUTUBE_URL)
+query = urlparse.parse_qs(url_data.query)
+YOUTUBE_ID = query["v"][0]
+
+
+# remove previous input video
+!rm -f /content/sample_data/input_vid.mp4
+
+
+#@markdown ___
+
+#@markdown ### Trim the video (start, end) seconds
+start = 00 #@param {type:"integer"}
+end = 30 #@param {type:"integer"}
+interval = end - start
+#@markdown ___
+# Download the YouTube video using yt-dlp
+!yt-dlp -f 'bestvideo[ext=mp4]' --output "youtube.%(ext)s" https://www.youtube.com/watch?v=$YOUTUBE_ID
+
+# Cut the video using FFmpeg
+!ffmpeg -y -i youtube.mp4 -ss {start} -t {interval} -async 1 /content/sample_data/input_vid.mp4
+
+# Preview the trimmed video
+from IPython.display import HTML
+from base64 import b64encode
+mp4 = open('/content/sample_data/input_vid.mp4','rb').read()
+data_url = "data:video/mp4;base64," + b64encode(mp4).decode()
+HTML(f"""<video width=600 controls><source src="{data_url}"></video>""")
